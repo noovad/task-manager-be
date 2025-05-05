@@ -13,7 +13,12 @@
     "test": "test"
   },
   "devDependencies": {
+    "@prisma/client": "^6.7.0",
+    "@types/connect": "^3.4.38",
+    "@types/estree": "^1.0.7",
     "@types/express": "^5.0.1",
+    "@types/json-schema": "^7.0.15",
+    "@types/mime": "^3.0.4",
     "@types/node": "^22.15.3",
     "dotenv": "^16.5.0",
     "eslint": "^9.26.0",
@@ -35,8 +40,5 @@
     "url": "https://github.com/noovad/task-manager-be/issues"
   },
   "homepage": "https://github.com/noovad/task-manager-be#readme",
-  "description": "",
-  "dependencies": {
-    "@prisma/client": "^6.7.0"
-  }
+  "description": ""
 }
