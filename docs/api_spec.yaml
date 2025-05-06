@@ -1,0 +1,324 @@
+openapi: 3.0.3
+info:
+  title: Task Manager
+  description: REST API sederhana untuk mengelola Tasks dan Projects.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api/v1
+
+paths:
+  # TASK MANAGEMENT
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Get all tasks
+      parameters:
+        - name: name
+          in: query
+          description: Filter tasks by name
+          required: false
+          schema:
+            type: string
+        - name: projectName
+          in: query
+          description: Filter tasks by project name
+          required: false
+          schema:
+            type: string
+        - name: dueDateFrom
+          in: query
+          description: Filter tasks by due date (from)
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: dueDateTo
+          in: query
+          description: Filter tasks by due date (to)
+          required: false
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+    post:
+      tags:
+        - Tasks
+      summary: Create a new task
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid input
+
+  /tasks/{id}:
+    get:
+      tags:
+        - Tasks
+      summary: Get a task by ID
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Task detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          description: Task not found
+    put:
+      tags:
+        - Tasks
+      summary: Update a task
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        '200':
+          description: Task updated
+        '400':
+          description: Invalid input
+        '404':
+          description: Task not found
+    delete:
+      tags:
+        - Tasks
+      summary: Delete a task
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '204':
+          description: Task deleted
+        '404':
+          description: Task not found
+
+  # PROJECT MANAGEMENT
+  /projects:
+    get:
+      tags:
+        - Projects
+      summary: Get all projects
+      responses:
+        '200':
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+    post:
+      tags:
+        - Projects
+      summary: Create a new project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectInput'
+      responses:
+        '201':
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          description: Invalid input
+
+  /projects/{id}:
+    get:
+      tags:
+        - Projects
+      summary: Get a project by ID
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Project detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          description: Project not found
+    put:
+      tags:
+        - Projects
+      summary: Update a project
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectInput'
+      responses:
+        '200':
+          description: Project updated
+        '400':
+          description: Invalid input
+        '404':
+          description: Project not found
+    delete:
+      tags:
+        - Projects
+      summary: Delete a project
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '204':
+          description: Project deleted
+        '404':
+          description: Project not found
+
+components:
+  parameters:
+    TaskId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ProjectId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    Priority:
+      type: string
+      enum: [LOW, MEDIUM, HIGH]
+
+    Status:
+      type: string
+      enum: [TODO, IN_PROGRESS, DONE]
+
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        projectName:
+          type: string
+        priority:
+          $ref: '#/components/schemas/Priority'
+        assignedUserId:
+          type: string
+          format: uuid
+        dueDate:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/Status'
+        description:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    TaskInput:
+      type: object
+      required:
+        - name
+        - projectName
+        - priority
+        - assignedUserId
+        - dueDate
+        - status
+      properties:
+        name:
+          type: string
+        projectName:
+          type: string
+        priority:
+          $ref: '#/components/schemas/Priority'
+        assignedUserId:
+          type: string
+          format: uuid
+        dueDate:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/Status'
+        description:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        userIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    ProjectInput:
+      type: object
+      required:
+        - name
+        - userIds
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        userIds:
+          type: array
+          items:
+            type: string
+            format: uuid
