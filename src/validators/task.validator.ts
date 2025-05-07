@@ -52,6 +52,9 @@ export const createTaskValidator = checkSchema({
             options: [['TODO', 'IN_PROGRESS', 'DONE']],
             errorMessage: 'Status must be TODO, IN_PROGRESS, or DONE',
         },
+        optional: {
+            options: { nullable: true },
+        },
     },
 
     description: {
