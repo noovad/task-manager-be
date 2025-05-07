@@ -15,18 +15,19 @@ paths:
         - Tasks
       summary: Get all tasks
       parameters:
-        - name: name
+        - name: title
           in: query
-          description: Filter tasks by name
+          description: Filter tasks by title
           required: false
           schema:
             type: string
-        - name: projectName
+        - name: projectId
           in: query
-          description: Filter tasks by project name
+          description: Filter tasks by project ID
           required: false
           schema:
             type: string
+            format: uuid
         - name: dueDateFrom
           in: query
           description: Filter tasks by due date (from)
@@ -43,13 +44,17 @@ paths:
             format: date-time
       responses:
         '200':
-          description: List of tasks
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Task'
+          description: Data successfully retrieved.
+        '204':
+          description: Request succeeded but no data returned.
+        '400':
+          description: Invalid or incorrectly formatted query parameters.
+        '404':
+          description: Resource not found.
+        '408':
+          description: Server did not respond in time.
+        '500':
+          description: General server-side error.   
     post:
       tags:
         - Tasks
@@ -231,10 +236,11 @@ components:
         id:
           type: string
           format: uuid
-        name:
+        title:
           type: string
-        projectName:
+        projectId:
           type: string
+          format: uuid
         priority:
           $ref: '#/components/schemas/Priority'
         assignedUserId:
@@ -255,17 +261,18 @@ components:
     TaskInput:
       type: object
       required:
-        - name
-        - projectName
+        - title
+        - projectId
         - priority
         - assignedUserId
         - dueDate
         - status
       properties:
-        name:
+        title:
           type: string
-        projectName:
+        projectId:
           type: string
+          format: uuid
         priority:
           $ref: '#/components/schemas/Priority'
         assignedUserId:

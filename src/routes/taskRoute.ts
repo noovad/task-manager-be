@@ -1,14 +1,11 @@
 import { Router } from 'express';
 import { createTaskController } from '../controllers/task.controller';
+import { createTaskValidator } from '../validators/task.validator';
+import { validate } from '../middlewares/validate';
 
 const router = Router();
 
-router.get("/tasks", (req, res) => {
-  res.send("List of tasks");
-});
-
-router.post("/tasks", createTaskController);
-
+router.post("/tasks", createTaskValidator, validate, createTaskController);
 
 export default router;
 

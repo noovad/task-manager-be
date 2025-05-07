@@ -1,8 +1,8 @@
-import { TaskModel } from '../models/task.model';
+import { TaskRepository, taskRequest } from "../repositories/task.repositories";
 
-export const createTaskService = async (data: TaskModel) => {
+export const createTaskService = async (data: taskRequest) => {
   try {
-    const task = await TaskModel.createTask(data);
+    const task = await TaskRepository.createTask(data);
     return task;
   } catch (error) {
     console.error('Error creating task:', error);

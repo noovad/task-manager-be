@@ -1,10 +1,10 @@
 {
   "name": "task-manager-be",
   "version": "1.0.0",
-  "main": "app.ts",
+  "main": "src/app.ts",
   "scripts": {
-    "start": "npx ts-node app.ts",
-    "demon": "npx nodemon app.ts",
+    "start": "npx ts-node src/app.ts",
+    "demon": "npx nodemon src/app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -41,5 +41,8 @@
     "url": "https://github.com/noovad/task-manager-be/issues"
   },
   "homepage": "https://github.com/noovad/task-manager-be#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "express-validator": "^7.2.1"
+  }
 }
