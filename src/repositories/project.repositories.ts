@@ -92,3 +92,21 @@ export const remove = async (id: string) => {
     },
   });
 };
+
+export const inviteMembers = async (projectId: string, users: string[]) => {
+  return await prisma.projectMember.createMany({
+    data: users.map((user) => ({
+      projectId,
+      userId: user,
+    })),
+    skipDuplicates: true,
+  });
+};
+
+export const removeMember = async (projectId: string, userId: string) => {
+  return await prisma.projectMember.delete({
+    where: {
+      projectId_userId: { projectId, userId },
+    },
+  });
+};

@@ -38,7 +38,7 @@ const findOne = asyncHandler(async (req: Request, res: Response) => {
 
 const update = asyncHandler(async (req: Request, res: Response) => {
   // TODO: Nanti userId diambil dari middleware auth req.user.id
-  const userId = 'cbf0219e-307e-4976-a34f-e77b4ded484c';
+  const userId = 'cb64cc7f-3b23-4c4b-af77-0a56ff9853a5';
 
   const { id: projectId } = req.params;
 
@@ -59,4 +59,36 @@ const remove = asyncHandler(async (req: Request, res: Response) => {
   res.status(204).json(HttpResponse.OK());
 });
 
-export { create, findAll, findOne, update, remove };
+const inviteMembers = asyncHandler(async (req: Request, res: Response) => {
+  // TODO: Nanti userId diambil dari middleware auth req.user.id
+  const userId = 'cb64cc7f-3b23-4c4b-af77-0a56ff9853a5';
+
+  const { id: projectId } = req.params;
+
+  const payload = req.body;
+
+  await projectService.inviteMembers(projectId, userId, payload);
+  res.status(201).json(HttpResponse.OK('User invited successfully'));
+});
+
+const removeMember = asyncHandler(async (req: Request, res: Response) => {
+  // TODO: Nanti userId diambil dari middleware auth req.user.id
+  const userId = 'cb64cc7f-3b23-4c4b-af77-0a56ff9853a5';
+
+  const { id: projectId } = req.params;
+
+  const { id: memberId } = req.body;
+
+  await projectService.removeMember(projectId, userId, memberId);
+  res.status(204).json(HttpResponse.OK());
+});
+
+export {
+  create,
+  findAll,
+  findOne,
+  update,
+  remove,
+  inviteMembers,
+  removeMember,
+};

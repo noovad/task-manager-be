@@ -1,6 +1,7 @@
-import { projectRequest } from '../dto/project.dto';
+import { inviteRequest, projectRequest } from '../dto/project.dto';
 import AppError from '../errors/app.error';
 import * as projectRepositories from '../repositories/project.repositories';
+import { findByIds } from '../repositories/user.repositories';
 import { HttpResponse } from '../utils/httpResponse';
 
 const create = async (project: projectRequest, userId: string) => {
@@ -58,19 +59,6 @@ const update = async (
     throw new AppError(HttpResponse.NOT_FOUND, [], 'Project not found');
   }
 
-  const isMember = await projectRepositories.findByUserAndProject(
-    userId,
-    projectId
-  );
-
-  if (!isMember) {
-    throw new AppError(
-      HttpResponse.FORBIDDEN,
-      [],
-      'You are not a member of this project'
-    );
-  }
-
   if (data.ownerId !== userId) {
     throw new AppError(
       HttpResponse.FORBIDDEN,
@@ -90,19 +78,6 @@ const remove = async (projectId: string, userId: string) => {
     throw new AppError(HttpResponse.NOT_FOUND, [], 'Project not found');
   }
 
-  const isMember = await projectRepositories.findByUserAndProject(
-    userId,
-    projectId
-  );
-
-  if (!isMember) {
-    throw new AppError(
-      HttpResponse.FORBIDDEN,
-      [],
-      'You are not a member of this project'
-    );
-  }
-
   if (data.ownerId !== userId) {
     throw new AppError(
       HttpResponse.FORBIDDEN,
@@ -114,4 +89,87 @@ const remove = async (projectId: string, userId: string) => {
   return projectRepositories.remove(projectId);
 };
 
-export { create, findAll, findOne, update, remove };
+const inviteMembers = async (
+  projectId: string,
+  userId: string,
+  payload: inviteRequest
+) => {
+  const data = await projectRepositories.findById(projectId);
+
+  if (!data) {
+    throw new AppError(HttpResponse.NOT_FOUND, [], 'Project not found');
+  }
+
+  if (data.ownerId !== userId) {
+    throw new AppError(
+      HttpResponse.FORBIDDEN,
+      [],
+      'You are not the owner of this project'
+    );
+  }
+
+  const usersToInvite = await findByIds(payload.users);
+
+  if (usersToInvite.length !== payload.users.length) {
+    throw new AppError(
+      HttpResponse.NOT_FOUND,
+      [],
+      'One or more users not found'
+    );
+  }
+
+  return await projectRepositories.inviteMembers(projectId, payload.users);
+};
+
+const removeMember = async (
+  projectId: string,
+  userId: string,
+  memberId: string
+) => {
+  const data = await projectRepositories.findById(projectId);
+
+  if (!data) {
+    throw new AppError(HttpResponse.NOT_FOUND, [], 'Project not found');
+  }
+
+  if (data.ownerId !== userId) {
+    throw new AppError(
+      HttpResponse.FORBIDDEN,
+      [],
+      'You are not the owner of this project'
+    );
+  }
+
+  const isMember = await projectRepositories.findByUserAndProject(
+    memberId,
+    projectId
+  );
+
+  if (!isMember) {
+    throw new AppError(
+      HttpResponse.FORBIDDEN,
+      [],
+      'User to be removed is not a member of this project'
+    );
+  }
+
+  if (userId === memberId) {
+    throw new AppError(
+      HttpResponse.FORBIDDEN,
+      [],
+      'You cannot remove yourself as the project owner'
+    );
+  }
+
+  return projectRepositories.removeMember(projectId, memberId);
+};
+
+export {
+  create,
+  findAll,
+  findOne,
+  update,
+  remove,
+  inviteMembers,
+  removeMember,
+};
