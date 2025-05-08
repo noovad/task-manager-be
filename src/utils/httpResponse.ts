@@ -2,16 +2,18 @@ export const HttpResponse = {
     /**
      * Success Responses
      */
-    OK: {
+    OK: (customMessage?: string, data?: JSON) => ({
         status: 200,
-        message: "OK",
+        message: customMessage || "OK",
         code: "OK",
-    },
-    CREATED: {
+        data: data
+    }),
+    CREATED: (customMessage?: string, data?: JSON) => ({
         status: 201,
-        message: "Created",
+        message: customMessage || "Created",
         code: "CREATED",
-    },
+        data: data
+    }),
 
     /**
      * Client Error Responses
