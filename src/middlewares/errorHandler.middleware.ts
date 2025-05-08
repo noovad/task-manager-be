@@ -21,7 +21,7 @@ const errorHandler = (err, req, res, next) => {
     }
 
     if (err instanceof Prisma.PrismaClientValidationError) {
-        const errorResponse = HttpResponse.BAD_REQUEST('Invalid input data format');
+        const errorResponse = HttpResponse.BAD_REQUEST(err.message);
         return res.status(errorResponse.status).json({
             success: false,
             error: errorResponse,
@@ -40,9 +40,9 @@ const errorHandler = (err, req, res, next) => {
         return res.status(err.statusCode).json({
             success: false,
             error: {
+                status: err.statusCode,
                 message: err.message,
                 code: err.code,
-                status: err.statusCode,
                 details: err.details,
             },
         });
@@ -52,8 +52,9 @@ const errorHandler = (err, req, res, next) => {
     return res.status(500).json({
         success: false,
         error: {
-            message: err.message || 'An unexpected error occurred',
             status: 500,
+            message: err.message || 'An unexpected error occurred',
+            code: 'INTERNAL_SERVER_ERROR',
         },
     });
 };
