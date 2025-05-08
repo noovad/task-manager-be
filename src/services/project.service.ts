@@ -1,8 +1,13 @@
+import { projectRequest } from '../dto/project.dto';
 import AppError from '../errors/app.error';
 import * as projectRepositories from '../repositories/project.repositories';
 import { HttpResponse } from '../utils/httpResponse';
 
-const create = async () => {};
+const create = async (project: projectRequest, userId: string) => {
+  const data = await projectRepositories.create(project, userId);
+
+  return data;
+};
 
 const findAll = async (userId: string) => {
   return projectRepositories.findAll(userId);
@@ -28,11 +33,51 @@ const findOne = async (userId: string, projectId: string) => {
     );
   }
 
-  return data;
+  const mappingData = {
+    ...data,
+    members: data.members.map((member) => ({
+      id: member.user.id,
+      name: member.user.name,
+      username: member.user.username,
+      email: member.user.email,
+      avatar: member.user.avatar,
+    })),
+  };
+
+  return mappingData;
 };
 
 const update = async () => {};
 
-const remove = async () => {};
+const remove = async (projectId: string, userId: string) => {
+  const data = await projectRepositories.findById(projectId);
+
+  if (!data) {
+    throw new AppError(HttpResponse.NOT_FOUND, [], 'Project not found');
+  }
+
+  const isMember = await projectRepositories.findByUserAndProject(
+    userId,
+    projectId
+  );
+
+  if (!isMember) {
+    throw new AppError(
+      HttpResponse.FORBIDDEN,
+      [],
+      'You are not a member of this project'
+    );
+  }
+
+  if (data.ownerId !== userId) {
+    throw new AppError(
+      HttpResponse.FORBIDDEN,
+      [],
+      'You are not the owner of this project'
+    );
+  }
+
+  return projectRepositories.remove(projectId);
+};
 
 export { create, findAll, findOne, update, remove };

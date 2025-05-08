@@ -1,4 +1,23 @@
 import prisma from '../configs/prismaClient';
+import { projectRequest } from '../dto/project.dto';
+
+export const create = async (data: projectRequest, userId: string) => {
+  return await prisma.project.create({
+    data: {
+      ...data,
+      ownerId: userId,
+      members: {
+        create: {
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      },
+    },
+  });
+};
 
 export const findAll = async (userId: string) => {
   return await prisma.project.findMany({
@@ -17,6 +36,27 @@ export const findById = async (id: string) => {
     where: {
       id,
     },
+    include: {
+      members: {
+        select: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              username: true,
+              email: true,
+              avatar: true,
+            },
+          },
+        },
+      },
+      _count: {
+        select: {
+          tasks: true,
+          members: true,
+        },
+      },
+    },
   });
 };
 
@@ -24,7 +64,7 @@ export const findByUserAndProject = async (
   userId: string,
   projectId: string
 ) => {
-  return await prisma.project.findUnique({
+  return await prisma.project.findFirst({
     where: {
       id: projectId,
       members: {
@@ -32,6 +72,14 @@ export const findByUserAndProject = async (
           userId,
         },
       },
+    },
+  });
+};
+
+export const remove = async (id: string) => {
+  return await prisma.project.delete({
+    where: {
+      id,
     },
   });
 };
