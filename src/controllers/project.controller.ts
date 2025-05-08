@@ -37,7 +37,15 @@ const findOne = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const update = asyncHandler(async (req: Request, res: Response) => {
-  res.status(200).json(HttpResponse.OK('Project updated successfully'));
+  // TODO: Nanti userId diambil dari middleware auth req.user.id
+  const userId = 'cbf0219e-307e-4976-a34f-e77b4ded484c';
+
+  const { id: projectId } = req.params;
+
+  const payload = req.body;
+
+  const data = await projectService.update(payload, projectId, userId);
+  res.status(200).json(HttpResponse.OK('Project updated successfully', data));
 });
 
 const remove = asyncHandler(async (req: Request, res: Response) => {

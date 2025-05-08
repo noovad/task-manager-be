@@ -47,7 +47,41 @@ const findOne = async (userId: string, projectId: string) => {
   return mappingData;
 };
 
-const update = async () => {};
+const update = async (
+  payload: projectRequest,
+  projectId: string,
+  userId: string
+) => {
+  const data = await projectRepositories.findById(projectId);
+
+  if (!data) {
+    throw new AppError(HttpResponse.NOT_FOUND, [], 'Project not found');
+  }
+
+  const isMember = await projectRepositories.findByUserAndProject(
+    userId,
+    projectId
+  );
+
+  if (!isMember) {
+    throw new AppError(
+      HttpResponse.FORBIDDEN,
+      [],
+      'You are not a member of this project'
+    );
+  }
+
+  if (data.ownerId !== userId) {
+    throw new AppError(
+      HttpResponse.FORBIDDEN,
+      [],
+      'You are not the owner of this project'
+    );
+  }
+  const updatedData = await projectRepositories.update(payload, projectId);
+
+  return updatedData;
+};
 
 const remove = async (projectId: string, userId: string) => {
   const data = await projectRepositories.findById(projectId);

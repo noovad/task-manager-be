@@ -76,6 +76,15 @@ export const findByUserAndProject = async (
   });
 };
 
+export const update = async (data: projectRequest, id: string) => {
+  return await prisma.project.update({
+    where: {
+      id,
+    },
+    data,
+  });
+};
+
 export const remove = async (id: string) => {
   return await prisma.project.delete({
     where: {
