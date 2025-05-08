@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { createTaskController } from '../controllers/task.controller';
 import { createTaskValidator } from '../validators/task.validator';
-import { validate } from '../middlewares/validate';
+import { validate } from '../middlewares/validate.middleware';
 
 const router = Router();
 

@@ -1,5 +1,4 @@
-export function extractForeignKeyColumn(meta: any): string {
-    console.log('Meta:', meta);
+export function extractForeignKey(meta: any): string {
     if (meta && meta.constraint) {
         const match = meta.constraint.match(/_(.+?)_fkey/);
         if (match && match[1]) {

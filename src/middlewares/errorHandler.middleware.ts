@@ -1,10 +1,11 @@
 import { Prisma } from '@prisma/client';
-import { extractForeignKeyColumn } from '../utils/extractForeignKeyColumn';
-import { HttpResponse } from '../utils/httpResponseCode';
+import { HttpResponse } from '../utils/httpResponse';
+import { extractForeignKey } from '../utils/extractForeignKey';
+import appError from '../errors/app.error';
 
 const errorHandler = (err, req, res, next) => {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
-        const foreignKeyErrorColumn = extractForeignKeyColumn(err.meta);
+        const foreignKeyErrorColumn = extractForeignKey(err.meta);
         const prismaErrorMap = {
             P2002: HttpResponse.CONFLICT,
             P2003: HttpResponse.BAD_REQUEST(`Foreign key constraint failed on the field: ${foreignKeyErrorColumn}`),
@@ -34,6 +35,19 @@ const errorHandler = (err, req, res, next) => {
             error: errorResponse,
         });
     }
+
+    if (err instanceof appError) {
+        return res.status(err.statusCode).json({
+            success: false,
+            error: {
+                message: err.message,
+                code: err.code,
+                status: err.statusCode,
+                details: err.details,
+            },
+        });
+    }
+
 
     return res.status(500).json({
         success: false,

@@ -7,11 +7,16 @@ export const HttpResponse = {
         message: "OK",
         code: "OK",
     },
+    CREATED: {
+        status: 201,
+        message: "Created",
+        code: "CREATED",
+    },
 
     /**
      * Client Error Responses
      */
-    BAD_REQUEST: (customMessage: string) => ({
+    BAD_REQUEST: (customMessage?: string) => ({
         status: 400,
         message: customMessage || "Bad Request",
         code: "BAD_REQUEST",
